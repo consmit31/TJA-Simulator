@@ -1,0 +1,17 @@
+body, html {
+    /* text-align: center;  */
+    margin: 0;
+    padding: 0;
+    /* width: 100%;
+    height: 100%; */
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+canvas {
+    border: 1px solid black;
+    background-color: #000; 
+    width: 100%;
+    height: 100%;
+    display: block; /* Ensure canvas takes up all available space */
+}
+
