@@ -8,6 +8,7 @@ const BLACK = "#000000";
 const ORANGE = "#FFA500";
 const GRAY = "#828282";
 const GREEN = "#208515";
+const RED = "#FF0000";
 const BLUE = "#00B0B0";
 const YELLOW = "#FFFF00";
 const HIGHLIGHT_COLOR = "#32C832";
@@ -45,8 +46,9 @@ class State{
     blackCarSpeed;
     blueCarSpeed;
     orangeCarSpeed;
+    systemStatus;
  
-    constructor(blackCarX=0, blueCarX=0, orangeCarX=0, blackCarY=0, blueCarY=0, orangeCarY=0, blackCarSpeed=0, blueCarSpeed=0, orangeCarSpeed){
+    constructor(blackCarX=0, blueCarX=0, orangeCarX=0, blackCarY=0, blueCarY=0, orangeCarY=0, blackCarSpeed=0, blueCarSpeed=0, orangeCarSpeed=0, systemStatus=true){
         this.blackCarX = blackCarX;
         this.blueCarX = blueCarX;
         this.orangeCarX = orangeCarX;
@@ -56,10 +58,10 @@ class State{
         this.blackCarSpeed = blackCarSpeed;
         this.blueCarSpeed = blueCarSpeed;
         this.orangeCarSpeed = orangeCarSpeed;
+        this.systemStatus = systemStatus;
     }
 
     setState(newState){
-        console.log("NewState:", newState);
         this.blackCarX = newState.blackCarX;
         this.blueCarX = newState.blueCarX;
         this.orangeCarX = newState.orangeCarX;
@@ -69,6 +71,7 @@ class State{
         this.blackCarSpeed = newState.blackCarSpeed;
         this.blueCarSpeed = newState.blueCarSpeed;
         this.orangeCarSpeed = newState.orangeCarSpeed;
+        this.systemStatus = newState.systemStatus;
     }
 
     stopCars(){
@@ -88,32 +91,44 @@ Switching from TJA to ACC because there is not enough traffic and faster speeds 
 // Use case descriptions 
 let descriptions = {
     1: [
-        "Use Case 2: System works as expected",
+        "Use Case 1: System works as expected",
         "Target vehicle is deccelerating and eventually comes",
-        "to a stop. The system adjusts the following distance accordingly,",
-        "ensuring the user's car maintains a safe gap as the target decelerates.",
+        "to a stop. The system adjusts the following distance",
+        " accordingly, ensuring the user's car maintains a",
+        "safe gap as the target decelerates."
     ],
     2: [
       "Use Case 2: System works as expected",
-      "Target vehicle is accelerating",
-      "The system adjusts the following distance accordingly,",
-      "ensuring the user's car maintains a safe gap as the target accelerates.",
+      "Target vehicle is accelerating. The system adjusts the",
+      "following distance accordingly, ensuring the user's car",
+      "maintains a safe distance as the target accelerates.",
     ],
     3: [
         "Use Case 3: System works as expected",
         "User's car is maintaining a safe following distance",
-        "when a third car enters their lane between them and the target vehicle.",
-        "The system adjusts the following distance accordingly,"
+        "when a third car enters their lane between them and",
+        "the target vehicle. The system then adjusts",
+        "the following distance accordingly."
+    ],
+    4: ["Use Case 4: System is not initially active",
+        "The user activates the system by pressing the button.",
+        "The system slows the vehicle and",
+        "adjusts the following distance accordingly."
+    ],
+    5: ["Use Case 5: System works as expected",
+        "System automatically disengages when there is no target",
+        "vehicle in front of the user's car. ACC then activates,",
+        "Accelerating the car to the its maximum speed.",
     ]
   };
   
 // blackCarX blueCarX orangeCarX blackCarY blueCarY orangeCarY blackCarSpeed blueCarSpeed orangeCarSpeed
 let initialStates = {
-  1: new State(SCREEN_WIDTH / 2, 0, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 6, -1),
-  2: new State(SCREEN_WIDTH / 4, (SCREEN_WIDTH / 4) - 100, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 2, -1),
-  3: new State(CAR_WIDTH * 3.2, CAR_WIDTH, CAR_WIDTH, RIGHT_LANE, RIGHT_LANE, MIDDLE_LANE, 1, 1, 1.2),
-//   4: new State(0, 0, 0, 0, 0, 0),
-//   5: new State(SCREEN_WIDTH / 2, 0, -1, 2, 6, -1),
+    1: new State(SCREEN_WIDTH / 2, 0, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 6, -1),
+    2: new State(SCREEN_WIDTH / 4, (SCREEN_WIDTH / 4) - 100, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 2, -1),
+    3: new State(CAR_WIDTH * 3.2, CAR_WIDTH, CAR_WIDTH, RIGHT_LANE, RIGHT_LANE, MIDDLE_LANE, 1, 1, 1.2),
+    4: new State(SCREEN_WIDTH / 2, 0, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 6, -1, false),
+    5: new State(-1, CAR_WIDTH * 2, -1, -1, RIGHT_LANE, -1, -1, 2, -1),
 //   6: new State(0, SCREEN_WIDTH / 2, 1, 6, 2, -1),
 //   7: new State(0, 0, SCREEN_WIDTH / 2, 6, -2, -1),
 //   8: new State(0, 0, 0, 0, 0, 0),
@@ -129,12 +144,32 @@ function drawText(text, x, y, color = WHITE) {
 }
 
 // Draw description helper
-function drawDescription(text, top = 0, interval = 50, x = SCREEN_WIDTH / 2){
+function drawDescription(text, top = 0, interval = 40, x = SCREEN_WIDTH / 2){
     if (!descriptionDrawn) {
         for (const [index, line] of text.entries()){
             drawText(line, x, top + interval * (index + 1));
         }
     }
+}
+
+// Draw system status helper
+function drawSystemStatus(bool) {
+    let width = 300;
+    let height = 65;
+    y = SCREEN_HEIGHT - 225;
+    x = SCREEN_WIDTH / 2 - width / 2;
+
+    ctx.fillStyle = WHITE;
+    ctx.fillRect(
+        x,
+        y,
+        width,
+        height
+    );
+
+    let text = bool ? "Active" : "Not active";
+    let textColor = bool? GREEN : RED;
+    drawText(text, 400, y + 40, textColor);
 }
 
 // Draw road helper
@@ -167,10 +202,11 @@ function drawBackground() {
 }
 
 // Draw setting helper
-function drawSetting(caseNum) {
+function drawSetting(caseNum, systemStatus = true) {
     drawBackground();
     drawRoad();
     drawDescription(descriptions[caseNum]);
+    drawSystemStatus(systemStatus);
     drawText("Press space to start/stop", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 125);
     drawText("Press Enter to restart", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 75);
 
@@ -190,7 +226,7 @@ function mainMenu() {
 
 // Game loop for Use Case 1
 function caseOne() {
-    drawSetting(1);
+    drawSetting(1, curState.systemStatus);
 
     // Black car
     ctx.fillStyle = BLACK;
@@ -223,7 +259,7 @@ function caseOne() {
 
 // Game loop for Use Case 2
 function caseTwo() {
-    drawSetting(2);
+    drawSetting(2, curState.systemStatus);
 
     // Black car
     ctx.fillStyle = BLACK;
@@ -269,7 +305,7 @@ function caseTwo() {
 
 // Game loop for Use Case 3
 function caseThree() {
-    drawSetting(3);
+    drawSetting(3, curState.systemStatus);
 
     // Black car
     ctx.fillStyle = BLACK;
@@ -283,11 +319,12 @@ function caseThree() {
     ctx.fillStyle = ORANGE;
     ctx.fillRect(curState.orangeCarX, curState.orangeCarY, CAR_WIDTH, CAR_HEIGHT);
 
-
+    // Update cars position if animation is active
     if (animate) {
 
         if (curState.blackCarX + CAR_WIDTH + 25 > SCREEN_WIDTH) { // Stop cars once the black car reaches the end of the screen
-            curState.stopCars()
+            curState.stopCars();
+            animate = false;
         }
 
         curState.blackCarX += curState.blackCarSpeed; // Black moves at a constant velocity
@@ -320,10 +357,82 @@ function caseThree() {
 }
 
 // Game loop for Use Case 4
-function caseFour() {}
+function caseFour() {
+    drawSetting(4, curState.systemStatus);
+
+    // Black car
+    ctx.fillStyle = BLACK;
+    ctx.fillRect(curState.blackCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+
+    // Blue car
+    ctx.fillStyle = BLUE;
+    ctx.fillRect(curState.blueCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+
+    // Update cars position if animation is active
+    if (animate) {
+        if (curState.blackCarX + CAR_WIDTH + 25 > SCREEN_WIDTH) { // Stop cars once the black car reaches the end of the screen
+            curState.stopCars();
+            animate = false;
+        }
+
+        if (curState.blackCarX > SCREEN_WIDTH / 2) {
+            if (curState.blackCarSpeed > 1) {
+                curState.blackCarSpeed -= 0.05;
+            }
+        }
+
+        curState.blackCarX += curState.blackCarSpeed;
+        if (curState.blackCarX > SCREEN_WIDTH) curState.blackCarX = -CAR_WIDTH;
+
+        const followingDistance = curState.blackCarX - curState.blueCarX;
+
+        if (followingDistance < CAR_WIDTH * 1.2) {
+            if (!curState.systemStatus) {
+                curState.systemStatus = true;
+                curState.blueCarSpeed = curState.blackCarSpeed;
+            }
+        }
+
+        if (curState.systemStatus) {
+            if (followingDistance < CAR_WIDTH * 2) {
+                if (curState.blueCarSpeed > 0.5) {
+                    curState.blueCarSpeed -= 0.05;
+                } else {
+                    curState.blueCarSpeed = curState.blackCarSpeed;
+                }
+            } else curState.blueCarSpeed = curState.blackCarSpeed;
+        }
+        curState.blueCarX += curState.blueCarSpeed;
+    }
+}
 
 // Game loop for Use Case 5
-function caseFive() {}
+function caseFive() {
+    drawSetting(4, curState.systemStatus);
+
+    // Blue car
+    ctx.fillStyle = BLUE;
+    ctx.fillRect(curState.blueCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+
+    // Update cars position if animation is active
+    if (animate) {
+        if (curState.blueCarX + CAR_WIDTH + 25 > SCREEN_WIDTH) { // Stop cars once the blue car reaches the end of the screen
+            curState.stopCars();
+            animate = false;
+        }
+
+        if (curState.blueCarX > SCREEN_WIDTH / 2) {
+            curState.systemStatus = false;
+        }
+
+        if (!curState.systemStatus){
+            if (curState.blueCarSpeed < 8) {
+                curState.blueCarSpeed += 0.1;
+            }
+        }
+        curState.blueCarX += curState.blueCarSpeed;
+    }
+}
 
 // Game loop for Use Case 6
 function caseSix() {}
@@ -338,9 +447,12 @@ function gameLoop() {
     else if (selectedOption == 0) caseOne();
     else if (selectedOption == 1) caseTwo();
     else if (selectedOption == 2) caseThree();
+    else if (selectedOption == 3) caseFour();
+    else if (selectedOption == 4) caseFive();
     
     requestAnimationFrame(gameLoop);
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
     canvas = document.getElementById("PrototypeCanvas");
