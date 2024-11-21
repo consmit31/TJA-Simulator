@@ -1,4 +1,7 @@
-let canvas, ctx;
+import { DrawHelp } from './drawHelp.js'; 
+
+let canvas, ctx, dh;
+
 
 // Constants
 const SCREEN_WIDTH = 800;
@@ -28,8 +31,6 @@ const RIGHT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) + LANE_WIDTH;
 const LEFT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) - LANE_WIDTH;
 
 // State
-let backgroundDrawn = false;
-let descriptionDrawn = false;
 let mainMenuActive = true;
 let selectedOption = 0;
 const menuOptions = Array.from({ length: 10 }, (_, i) => `Use Case ${i + 1}`);
@@ -80,47 +81,6 @@ class State{
         this.orangeCarSpeed = 0;
     }
 }
-/*
-Target vehicle is decelerating or coming to a stop
-Target vehicle is accelerating
-Activating the TJA system by pressing the button
-Disabling the TJA system by using the brake pedal
-Overriding the TJA system by using the accelerator pedal then reverting back to TJA
-Switching from TJA to ACC because there is not enough traffic and faster speeds can be supported.
-*/
-// Use case descriptions 
-let descriptions = {
-    1: [
-        "Use Case 1: System works as expected",
-        "Target vehicle is deccelerating and eventually comes",
-        "to a stop. The system adjusts the following distance",
-        " accordingly, ensuring the user's car maintains a",
-        "safe gap as the target decelerates."
-    ],
-    2: [
-      "Use Case 2: System works as expected",
-      "Target vehicle is accelerating. The system adjusts the",
-      "following distance accordingly, ensuring the user's car",
-      "maintains a safe distance as the target accelerates.",
-    ],
-    3: [
-        "Use Case 3: System works as expected",
-        "User's car is maintaining a safe following distance",
-        "when a third car enters their lane between them and",
-        "the target vehicle. The system then adjusts",
-        "the following distance accordingly."
-    ],
-    4: ["Use Case 4: System is not initially active",
-        "The user activates the system by pressing the button.",
-        "The system slows the vehicle and",
-        "adjusts the following distance accordingly."
-    ],
-    5: ["Use Case 5: System works as expected",
-        "System automatically disengages when there is no target",
-        "vehicle in front of the user's car. ACC then activates,",
-        "Accelerating the car to the its maximum speed.",
-    ]
-  };
   
 // blackCarX blueCarX orangeCarX blackCarY blueCarY orangeCarY blackCarSpeed blueCarSpeed orangeCarSpeed
 let initialStates = {
@@ -129,104 +89,12 @@ let initialStates = {
     3: new State(CAR_WIDTH * 3.2, CAR_WIDTH, CAR_WIDTH, RIGHT_LANE, RIGHT_LANE, MIDDLE_LANE, 1, 1, 1.2),
     4: new State(SCREEN_WIDTH / 2, 0, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 6, -1, false),
     5: new State(-1, CAR_WIDTH * 2, -1, -1, RIGHT_LANE, -1, -1, 2, -1),
-//   6: new State(0, SCREEN_WIDTH / 2, 1, 6, 2, -1),
-//   7: new State(0, 0, SCREEN_WIDTH / 2, 6, -2, -1),
-//   8: new State(0, 0, 0, 0, 0, 0),
 };
 var curState = new State(); 
 
-// Draw text helper
-function drawText(text, x, y, color = WHITE) {
-    ctx.fillStyle = color;
-    ctx.font = `${FONT_SIZE}px Arial`;
-    ctx.textAlign = "center";
-    ctx.fillText(text, x, y);
-}
-
-// Draw description helper
-function drawDescription(text, top = 0, interval = 40, x = SCREEN_WIDTH / 2){
-    if (!descriptionDrawn) {
-        for (const [index, line] of text.entries()){
-            drawText(line, x, top + interval * (index + 1));
-        }
-    }
-}
-
-// Draw system status helper
-function drawSystemStatus(bool) {
-    let width = 300;
-    let height = 65;
-    y = SCREEN_HEIGHT - 225;
-    x = SCREEN_WIDTH / 2 - width / 2;
-
-    ctx.fillStyle = WHITE;
-    ctx.fillRect(
-        x,
-        y,
-        width,
-        height
-    );
-
-    let text = bool ? "Active" : "Not active";
-    let textColor = bool? GREEN : RED;
-    drawText(text, 400, y + 40, textColor);
-}
-
-// Draw road helper
-function drawRoad() {
-    ctx.fillStyle = GRAY;
-    ctx.fillRect(0, (SCREEN_HEIGHT - ROAD_WIDTH) / 2, SCREEN_WIDTH, ROAD_WIDTH);
-
-    for (let i = 1; i < 3; i++) {
-        let dividerX = 0;
-        while (dividerX < SCREEN_WIDTH) {
-            ctx.fillStyle = YELLOW;
-            ctx.fillRect(
-                dividerX,
-                (SCREEN_HEIGHT - ROAD_WIDTH) / 2 + LANE_WIDTH * i,
-                DIVIDER_WIDTH,
-                DIVIDER_HEIGHT
-            );
-            dividerX += DIVIDER_SPACING;
-        }
-    }
-}
-
-// Draw background helper
-function drawBackground() {
-    if (!backgroundDrawn) {
-        ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        ctx.fillStyle = GREEN;
-        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    }
-}
-
-// Draw setting helper
-function drawSetting(caseNum, systemStatus = true) {
-    drawBackground();
-    drawRoad();
-    drawDescription(descriptions[caseNum]);
-    drawSystemStatus(systemStatus);
-    drawText("Press space to start/stop", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 125);
-    drawText("Press Enter to restart", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 75);
-
-}
-
-// Main menu loop
-function mainMenu() {
-    ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    ctx.fillStyle = BLACK;
-    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    menuOptions.forEach((option, index) => {
-        const color = index === selectedOption ? HIGHLIGHT_COLOR : WHITE;
-        drawText(option, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 200 + index * 50, color);
-    });
-}
-
 // Game loop for Use Case 1
 function caseOne() {
-    drawSetting(1, curState.systemStatus);
+    dh.drawSetting(1, curState.systemStatus);
 
     // Black car
     ctx.fillStyle = BLACK;
@@ -259,7 +127,7 @@ function caseOne() {
 
 // Game loop for Use Case 2
 function caseTwo() {
-    drawSetting(2, curState.systemStatus);
+    dh.drawSetting(2, curState.systemStatus);
 
     // Black car
     ctx.fillStyle = BLACK;
@@ -305,7 +173,7 @@ function caseTwo() {
 
 // Game loop for Use Case 3
 function caseThree() {
-    drawSetting(3, curState.systemStatus);
+    dh.drawSetting(3, curState.systemStatus);
 
     // Black car
     ctx.fillStyle = BLACK;
@@ -358,7 +226,7 @@ function caseThree() {
 
 // Game loop for Use Case 4
 function caseFour() {
-    drawSetting(4, curState.systemStatus);
+    dh.drawSetting(4, curState.systemStatus);
 
     // Black car
     ctx.fillStyle = BLACK;
@@ -408,7 +276,7 @@ function caseFour() {
 
 // Game loop for Use Case 5
 function caseFive() {
-    drawSetting(4, curState.systemStatus);
+    dh.drawSetting(4, curState.systemStatus);
 
     // Blue car
     ctx.fillStyle = BLUE;
@@ -442,7 +310,8 @@ function caseSeven() {}
 
 // Main animation loop
 function gameLoop() {
-    if (mainMenuActive) mainMenu();
+    dh = new DrawHelp(ctx);
+    if (mainMenuActive) dh.drawMainMenu(selectedOption, menuOptions);
    
     else if (selectedOption == 0) caseOne();
     else if (selectedOption == 1) caseTwo();
@@ -479,8 +348,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 animate = !animate; // Toggle animation state
             } else if (event.key === "Escape") {
                 mainMenuActive = true; // Go back to the main menu
-                backgroundDrawn = false; // Reset background drawn state
-                descriptionDrawn = false; // Reset description drawn state
+                dh.backgroundDrawn = false; // Reset background drawn state
+                dh.descriptionDrawn = false; // Reset description drawn state
             }
         }
     });

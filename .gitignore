@@ -2,12 +2,14 @@
 node_modules/
 dist/
 *.exe
+*.7z
 
 # Logs
 *.log
 
 # Environment files
 .env
+.vscode/
 
 # OS files
 .DS_Store
