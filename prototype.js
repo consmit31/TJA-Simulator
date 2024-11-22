@@ -2,29 +2,17 @@ import { DrawHelp } from './drawHelp.js';
 
 let canvas, ctx, dh;
 
-
 // Constants
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 650;
-const WHITE = "#FFFFFF";
 const BLACK = "#000000";
 const ORANGE = "#FFA500";
-const GRAY = "#828282";
-const GREEN = "#208515";
-const RED = "#FF0000";
 const BLUE = "#00B0B0";
-const YELLOW = "#FFFF00";
-const HIGHLIGHT_COLOR = "#32C832";
+
 
 const CAR_WIDTH = 50;
 const CAR_HEIGHT = 30;
-const CAR_SPEED = 5;
-const ROAD_WIDTH = 180;
 const LANE_WIDTH = 60;
-const DIVIDER_WIDTH = 4;
-const DIVIDER_HEIGHT = 2;
-const DIVIDER_SPACING = 8;
-const FONT_SIZE = 30;
 
 const MIDDLE_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2);
 const RIGHT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) + LANE_WIDTH;
@@ -88,8 +76,12 @@ let initialStates = {
     2: new State(SCREEN_WIDTH / 4, (SCREEN_WIDTH / 4) - 100, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 2, -1),
     3: new State(CAR_WIDTH * 3.2, CAR_WIDTH, CAR_WIDTH, RIGHT_LANE, RIGHT_LANE, MIDDLE_LANE, 1, 1, 1.2),
     4: new State(SCREEN_WIDTH / 2, 0, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 6, -1, false),
-    5: new State(-1, CAR_WIDTH * 2, -1, -1, RIGHT_LANE, -1, -1, 2, -1),
+    5: new State(-1, CAR_WIDTH * 2, -1, -1, RIGHT_LANE, -1, -1, 2, -1), 
+    6: new State(-1, CAR_WIDTH, -1, -1, RIGHT_LANE, -1, -1, 3, -1),
+    7: new State(-1, CAR_WIDTH, -1, -1, RIGHT_LANE, -1, -1, 3, -1),
+
 };
+
 var curState = new State(); 
 
 // Game loop for Use Case 1
@@ -276,7 +268,7 @@ function caseFour() {
 
 // Game loop for Use Case 5
 function caseFive() {
-    dh.drawSetting(4, curState.systemStatus);
+    dh.drawSetting(5, curState.systemStatus);
 
     // Blue car
     ctx.fillStyle = BLUE;
@@ -303,14 +295,60 @@ function caseFive() {
 }
 
 // Game loop for Use Case 6
-function caseSix() {}
+function caseSix() {
+    dh.drawSetting(6, curState.systemStatus);
+
+    // Blue car
+    ctx.fillStyle = BLUE;
+    ctx.fillRect(curState.blueCarX, curState.blueCarY, CAR_WIDTH, CAR_HEIGHT);
+
+    if (animate) {
+        if (curState.blueCarX + CAR_WIDTH + 25 > SCREEN_WIDTH) { // Stop cars once the blue car reaches the end of the screen
+            curState.stopCars();
+            animate = false;
+        }
+
+        if (curState.blueCarX > SCREEN_WIDTH / 3){
+            if (curState.blueCarY > MIDDLE_LANE) {
+                curState.blueCarY -= 1;
+            }
+        } 
+
+        if (curState.blueCarY - CAR_WIDTH / 2 < MIDDLE_LANE + LANE_WIDTH / 2){
+            curState.systemStatus = false;
+        }
+
+        curState.blueCarX += curState.blueCarSpeed;
+    }
+}
 
 // Game loop for Use Case 7
-function caseSeven() {}
+function caseSeven() {
+    dh.drawSetting(7, curState.systemStatus);
+
+    // Blue car
+    // ctx.fillStyle = BLUE;
+    // ctx.fillRect(curState.blueCarX, curState.blueCarY, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blueCarX, curState.blueCarY, BLUE)
+
+    if (animate) {
+        if (curState.blueCarX + CAR_WIDTH + 25 > SCREEN_WIDTH) { // Stop cars once the blue car reaches the end of the screen
+            curState.stopCars();
+            animate = false;
+        }
+
+        if (curState.blueCarX > SCREEN_WIDTH / 3){
+            if (curState.blueCarSpeed > 2)
+            curState.blueCarSpeed -= 0.05;
+            curState.systemStatus = false
+        } 
+
+        curState.blueCarX += curState.blueCarSpeed;
+    }
+}
 
 // Main animation loop
 function gameLoop() {
-    dh = new DrawHelp(ctx);
     if (mainMenuActive) dh.drawMainMenu(selectedOption, menuOptions);
    
     else if (selectedOption == 0) caseOne();
@@ -318,6 +356,8 @@ function gameLoop() {
     else if (selectedOption == 2) caseThree();
     else if (selectedOption == 3) caseFour();
     else if (selectedOption == 4) caseFive();
+    else if (selectedOption == 5) caseSix();
+    else if (selectedOption == 6) caseSeven();
     
     requestAnimationFrame(gameLoop);
 }
@@ -326,6 +366,7 @@ function gameLoop() {
 document.addEventListener("DOMContentLoaded", () => {
     canvas = document.getElementById("PrototypeCanvas");
     ctx = canvas.getContext("2d");
+    dh = new DrawHelp(ctx);
 
     document.addEventListener("keydown", (event) => {
         // Handle actions based on whether the main menu is active or not
@@ -348,8 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 animate = !animate; // Toggle animation state
             } else if (event.key === "Escape") {
                 mainMenuActive = true; // Go back to the main menu
-                dh.backgroundDrawn = false; // Reset background drawn state
-                dh.descriptionDrawn = false; // Reset description drawn state
+                dh.reset(); // Reset the draw helper
             }
         }
     });
