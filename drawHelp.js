@@ -8,7 +8,7 @@ const GREEN = "#208515";
 const RED = "#FF0000";
 const BLUE = "#00B0B0";
 const YELLOW = "#FFFF00";
-const HIGHLIGHT_COLOR = "#32C832";
+const HIGHLIGHT_COLOR = "#3498EB";
 
 const CAR_WIDTH = 50;
 const CAR_HEIGHT = 30;
@@ -21,7 +21,20 @@ const DIVIDER_SPACING = 8;
 const FONT_SIZE = 30;
 
 const blueCarImage = new Image();
-blueCarImage.src = "./assets/yellow_car.png";
+blueCarImage.src = "./assets/blue_car.png";
+
+const blackCarImage = new Image();
+blackCarImage.src = "./assets/black_car.png";
+
+const yellowCarImage = new Image();
+yellowCarImage.src = "./assets/yellow_car.png";
+
+const flowerImage = new Image();
+flowerImage.src = "./assets/flower.png";
+
+const treeImage = new Image();
+treeImage.src = "./assets/tree.png";
+
 
 const MIDDLE_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2);
 const RIGHT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) + LANE_WIDTH;
@@ -163,7 +176,42 @@ class DrawHelp {
   }
 
   drawCar(x, y, color){
-    this.ctx.drawImage(blueCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
+    switch (color){
+      case "BLUE":
+        this.ctx.drawImage(blueCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
+        break;
+
+      case "BLACK":
+        this.ctx.drawImage(blackCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
+        break;
+
+      case "YELLOW":
+        this.ctx.drawImage(yellowCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
+        break;
+
+      default:
+        this.ctx.drawImage(blueCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
+        break;
+    }
+  }
+
+  drawFlower(x, y){
+    this.ctx.drawImage(flowerImage, x, y, 20, 20);
+  }
+
+  drawTree(x, y){
+    this.ctx.drawImage(treeImage, x, y, 40, 80);
+  }
+
+  drawFoliage(){
+    this.drawFlower(100, 165);
+    this.drawFlower(75, 500);
+    this.drawFlower(225, 600);
+    this.drawFlower(675, 550);
+    this.drawFlower(700, 50);
+
+    this.drawTree(20, 120);
+    this.drawTree(700, 450)
   }
 
   // Draw background helper
@@ -173,6 +221,8 @@ class DrawHelp {
       this.ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
       this.ctx.fillStyle = GREEN;
       this.ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+      this.drawFoliage();
     }
     this.backgroundDrawn = true;
   }
@@ -192,8 +242,10 @@ class DrawHelp {
     if (selectedOption != this.currentSelectedMenuOption){
       this.currentSelectedMenuOption = selectedOption;
       this.ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-      this.ctx.fillStyle = BLACK;
+      this.ctx.fillStyle = GREEN;
       this.ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      this.drawFoliage();
+      
 
       menuOptions.forEach((option, index) => {
         const color = index === selectedOption ? HIGHLIGHT_COLOR : WHITE;

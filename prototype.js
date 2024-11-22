@@ -21,7 +21,7 @@ const LEFT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) - LANE_WIDTH;
 // State
 let mainMenuActive = true;
 let selectedOption = 0;
-const menuOptions = Array.from({ length: 10 }, (_, i) => `Use Case ${i + 1}`);
+const menuOptions = Array.from({ length: 7 }, (_, i) => `Use Case ${i + 1}`);
 let animate = false;
 
 /** @class State representing starting state of a use case */
@@ -89,12 +89,10 @@ function caseOne() {
     dh.drawSetting(1, curState.systemStatus);
 
     // Black car
-    ctx.fillStyle = BLACK;
-    ctx.fillRect(curState.blackCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blackCarX, RIGHT_LANE, "BLACK")
 
     // Blue car
-    ctx.fillStyle = BLUE;
-    ctx.fillRect(curState.blueCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
     if (animate) {
@@ -122,12 +120,10 @@ function caseTwo() {
     dh.drawSetting(2, curState.systemStatus);
 
     // Black car
-    ctx.fillStyle = BLACK;
-    ctx.fillRect(curState.blackCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blackCarX, RIGHT_LANE, "BLACK");
 
     // Blue car
-    ctx.fillStyle = BLUE;
-    ctx.fillRect(curState.blueCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
     if (animate) {
@@ -168,16 +164,13 @@ function caseThree() {
     dh.drawSetting(3, curState.systemStatus);
 
     // Black car
-    ctx.fillStyle = BLACK;
-    ctx.fillRect(curState.blackCarX, curState.blackCarY, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blackCarX, curState.blackCarY, "BLACK");
 
     // Blue car
-    ctx.fillStyle = BLUE;
-    ctx.fillRect(curState.blueCarX, curState.blueCarY, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blueCarX, curState.blueCarY, "BLUE");
     
-    // Orange car
-    ctx.fillStyle = ORANGE;
-    ctx.fillRect(curState.orangeCarX, curState.orangeCarY, CAR_WIDTH, CAR_HEIGHT);
+    // Yellow car
+    dh.drawCar(curState.orangeCarX, curState.orangeCarY, "YELLOW");
 
     // Update cars position if animation is active
     if (animate) {
@@ -221,12 +214,10 @@ function caseFour() {
     dh.drawSetting(4, curState.systemStatus);
 
     // Black car
-    ctx.fillStyle = BLACK;
-    ctx.fillRect(curState.blackCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blackCarX, RIGHT_LANE, "BLACK");
 
     // Blue car
-    ctx.fillStyle = BLUE;
-    ctx.fillRect(curState.blueCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCat(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
     if (animate) {
@@ -271,8 +262,7 @@ function caseFive() {
     dh.drawSetting(5, curState.systemStatus);
 
     // Blue car
-    ctx.fillStyle = BLUE;
-    ctx.fillRect(curState.blueCarX, RIGHT_LANE, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
     if (animate) {
@@ -299,8 +289,7 @@ function caseSix() {
     dh.drawSetting(6, curState.systemStatus);
 
     // Blue car
-    ctx.fillStyle = BLUE;
-    ctx.fillRect(curState.blueCarX, curState.blueCarY, CAR_WIDTH, CAR_HEIGHT);
+    dh.drawCar(curState.blueCarX, curState.blueCarY, "BLUE");
 
     if (animate) {
         if (curState.blueCarX + CAR_WIDTH + 25 > SCREEN_WIDTH) { // Stop cars once the blue car reaches the end of the screen
@@ -327,9 +316,7 @@ function caseSeven() {
     dh.drawSetting(7, curState.systemStatus);
 
     // Blue car
-    // ctx.fillStyle = BLUE;
-    // ctx.fillRect(curState.blueCarX, curState.blueCarY, CAR_WIDTH, CAR_HEIGHT);
-    dh.drawCar(curState.blueCarX, curState.blueCarY, BLUE)
+    dh.drawCar(curState.blueCarX, curState.blueCarY, "BLUE")
 
     if (animate) {
         if (curState.blueCarX + CAR_WIDTH + 25 > SCREEN_WIDTH) { // Stop cars once the blue car reaches the end of the screen
