@@ -1,3 +1,4 @@
+// Constants
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 650;
 const WHITE = "#FFFFFF";
@@ -35,7 +36,6 @@ flowerImage.src = "./assets/flower.png";
 const treeImage = new Image();
 treeImage.src = "./assets/tree.png";
 
-
 const MIDDLE_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2);
 const RIGHT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) + LANE_WIDTH;
 const LEFT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) - LANE_WIDTH;
@@ -43,50 +43,59 @@ const LEFT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) - LANE_WIDTH;
 // Use case descriptions 
 let descriptions = {
   1: [
-    "Use Case 1: System works as expected",
+    "Use Case 1: TJA system works as expected",
     "Target vehicle is deccelerating and eventually comes",
     "to a stop. The system adjusts the following distance",
     " accordingly, ensuring the user's car maintains a",
     "safe gap as the target decelerates.",
   ],
   2: [
-    "Use Case 2: System works as expected",
+    "Use Case 2: TJA system works as expected",
     "Target vehicle is accelerating. The system adjusts the",
     "following distance accordingly, ensuring the user's car",
     "maintains a safe distance as the target accelerates.",
   ],
   3: [
-    "Use Case 3: System works as expected",
+    "Use Case 3: TJA system works as expected",
     "User's car is maintaining a safe following distance",
     "when a third car enters their lane between them and",
     "the target vehicle. The system then adjusts",
     "the following distance accordingly.",
   ],
   4: [
-    "Use Case 4: System is not initially active",
+    "Use Case 4: TJA system is not initially active",
     "The user activates the system by pressing the button.",
     "The system slows the vehicle and",
     "adjusts the following distance accordingly.",
   ],
   5: [
-    "Use Case 5: System works as expected",
+    "Use Case 5: TJA system works as expected",
     "System automatically disengages when there is no target",
     "vehicle in front of the user's car. ACC then activates,",
     "Accelerating the car to the its maximum speed.",
   ],
   6: [
-    "Use Case 6: System works as expected",
+    "Use Case 6: TJA system works as expected",
     "Driver attempts to change lanes by activating the",
     "turn signal, resulting in the system deactivating",
   ],
   7: [
-    "Use Case 7: System works as expected",
-    "Driver manually activates the brakes to slow down",
-    "resulting in the system deactivating",
+    "Use Case 7: TJA system works as expected",
+    "Driver manually deactivates the system by pressing",
+    "the button located on the steering wheel,",
+    "delegating acceleration and deceleration to the driver.",
   ]
 };
 
+/**
+ * Class representing drawing helper.
+ */
 class DrawHelp {
+  /**
+   * Create a DrawHelp instance.
+   * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+   * @param {Array} menuOptions - The menu options.
+   */
   constructor(ctx, menuOptions) {
     console.log("DrawHelp initilized");
     this.ctx = ctx;
@@ -98,13 +107,24 @@ class DrawHelp {
     this.currentSelectedMenuOption = null;
   }
 
-  reset(){
+  /**
+   * Reset the drawing state.
+   */
+  reset() {
     this.backgroundDrawn = false;
     this.descriptionDrawn = false;
+    this.controlsDrawn = false;
     this.prevSystemStatus = null;
     this.currentSelectedMenuOption = null;
   }
 
+  /**
+   * Draw text on the canvas.
+   * @param {string} text - The text to draw.
+   * @param {number} x - The x-coordinate.
+   * @param {number} y - The y-coordinate.
+   * @param {string} [color=WHITE] - The color of the text.
+   */
   drawText(text, x, y, color = WHITE) {
     console.log("Drawing text");
     this.ctx.fillStyle = color;
@@ -113,7 +133,13 @@ class DrawHelp {
     this.ctx.fillText(text, x, y);
   }
 
-  // Draw description helper
+  /**
+   * Draw description text on the canvas.
+   * @param {Array} text - The description text lines.
+   * @param {number} [top=0] - The top y-coordinate.
+   * @param {number} [interval=40] - The interval between lines.
+   * @param {number} [x=SCREEN_WIDTH / 2] - The x-coordinate.
+   */
   drawDescription(text, top = 0, interval = 40, x = SCREEN_WIDTH / 2) {
     if (!this.descriptionDrawn) {
       console.log("Drawing description");
@@ -124,22 +150,25 @@ class DrawHelp {
     this.descriptionDrawn = true;
   }
 
-  drawControls(){
-    if (!this.controlsDrawn){
-      this.drawText(
-        "Press space to start/stop",
-        SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT - 125
-      ); 
-      this.drawText("Press Enter to restart", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 75);
+  /**
+   * Draw control instructions on the canvas.
+   */
+  drawControls() {
+    if (!this.controlsDrawn) {
+      this.drawText("Press space to start/stop", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 125);
+      this.drawText("Press Enter to restart", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 90);
+      this.drawText("Press Escape to return to selection menu", SCREEN_WIDTH / 2, SCREEN_HEIGHT-55);
       this.controlsDrawn = true;
     }
   }
 
-  // Draw system status helper
+  /**
+   * Draw system status on the canvas.
+   * @param {boolean} bool - The system status.
+   */
   drawSystemStatus(bool) {
-    if (bool != this.prevSystemStatus){
-      console.log("Drawing sytem status");
+    if (bool != this.prevSystemStatus) {
+      console.log("Drawing system status");
       var width = 300;
       var height = 65;
       var y = SCREEN_HEIGHT - 225;
@@ -154,7 +183,9 @@ class DrawHelp {
     }
   }
 
-  // Draw road helper
+  /**
+   * Draw the road on the canvas.
+   */
   drawRoad() {
     console.log("Drawing road");
     this.ctx.fillStyle = GRAY;
@@ -175,35 +206,51 @@ class DrawHelp {
     }
   }
 
-  drawCar(x, y, color){
-    switch (color){
+  /**
+   * Draw a car on the canvas.
+   * @param {number} x - The x-coordinate.
+   * @param {number} y - The y-coordinate.
+   * @param {string} color - The color of the car.
+   */
+  drawCar(x, y, color) {
+    switch (color) {
       case "BLUE":
         this.ctx.drawImage(blueCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
         break;
-
       case "BLACK":
         this.ctx.drawImage(blackCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
         break;
-
       case "YELLOW":
         this.ctx.drawImage(yellowCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
         break;
-
       default:
         this.ctx.drawImage(blueCarImage, x, y, CAR_WIDTH, CAR_HEIGHT);
         break;
     }
   }
 
-  drawFlower(x, y){
+  /**
+   * Draw a flower on the canvas.
+   * @param {number} x - The x-coordinate.
+   * @param {number} y - The y-coordinate.
+   */
+  drawFlower(x, y) {
     this.ctx.drawImage(flowerImage, x, y, 20, 20);
   }
 
-  drawTree(x, y){
+  /**
+   * Draw a tree on the canvas.
+   * @param {number} x - The x-coordinate.
+   * @param {number} y - The y-coordinate.
+   */
+  drawTree(x, y) {
     this.ctx.drawImage(treeImage, x, y, 40, 80);
   }
 
-  drawFoliage(){
+  /**
+   * Draw foliage on the canvas.
+   */
+  drawFoliage() {
     this.drawFlower(100, 165);
     this.drawFlower(75, 500);
     this.drawFlower(225, 600);
@@ -211,10 +258,12 @@ class DrawHelp {
     this.drawFlower(700, 50);
 
     this.drawTree(20, 120);
-    this.drawTree(700, 450)
+    this.drawTree(700, 450);
   }
 
-  // Draw background helper
+  /**
+   * Draw the background on the canvas.
+   */
   drawBackground() {
     if (!this.backgroundDrawn) {
       console.log("Drawing background");
@@ -227,37 +276,51 @@ class DrawHelp {
     this.backgroundDrawn = true;
   }
 
-  // Draw setting helper
+  /**
+   * Draw the instructions for the main menu.
+   */
+  drawInstructions() {
+    this.ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    this.ctx.fillStyle = GREEN;
+    this.ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    this.drawText("Use the arrow keys to navigate the menu", SCREEN_WIDTH / 2, SCREEN_HEIGHT-100);
+    this.drawText("Press Enter to select an option", SCREEN_WIDTH / 2, SCREEN_HEIGHT-60);
+    this.drawText("Press Escape to return to selection menu", SCREEN_WIDTH / 2, SCREEN_HEIGHT-20);
+  }
+
+  /**
+   * Draw the setting for a specific use case.
+   * @param {number} caseNum - The use case number.
+   * @param {boolean} [systemStatus=true] - The system status.
+   */
   drawSetting(caseNum, systemStatus = true) {
     this.drawBackground();
     this.drawRoad();
     this.drawDescription(descriptions[caseNum]);
     this.drawSystemStatus(systemStatus);
     this.drawControls();
-
   }
 
-  // Main menu loop
+  /**
+   * Draw the main menu.
+   * @param {number} selectedOption - The selected menu option.
+   * @param {Array} menuOptions - The menu options.
+   */
   drawMainMenu(selectedOption, menuOptions) {
-    if (selectedOption != this.currentSelectedMenuOption){
+    if (selectedOption != this.currentSelectedMenuOption) {
       this.currentSelectedMenuOption = selectedOption;
       this.ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
       this.ctx.fillStyle = GREEN;
       this.ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      this.drawInstructions();
       this.drawFoliage();
-      
 
       menuOptions.forEach((option, index) => {
         const color = index === selectedOption ? HIGHLIGHT_COLOR : WHITE;
-        this.drawText(
-          option,
-          SCREEN_WIDTH / 2,
-          SCREEN_HEIGHT / 2 - 200 + index * 50,
-          color
-        );
+        this.drawText(option, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 200 + index * 50, color);
       });
     }
   }
 }
 
-export { DrawHelp }; 
+export { DrawHelp };

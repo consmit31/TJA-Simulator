@@ -8,24 +8,23 @@ const SCREEN_HEIGHT = 650;
 const BLACK = "#000000";
 const ORANGE = "#FFA500";
 const BLUE = "#00B0B0";
-
-
 const CAR_WIDTH = 50;
 const CAR_HEIGHT = 30;
 const LANE_WIDTH = 60;
-
 const MIDDLE_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2);
 const RIGHT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) + LANE_WIDTH;
 const LEFT_LANE = (SCREEN_HEIGHT / 2) - (CAR_HEIGHT / 2) - LANE_WIDTH;
 
-// State
+// State variables
 let mainMenuActive = true;
 let selectedOption = 0;
 const menuOptions = Array.from({ length: 7 }, (_, i) => `Use Case ${i + 1}`);
 let animate = false;
 
-/** @class State representing starting state of a use case */
-class State{
+/**
+ * Class representing the state of a use case.
+ */
+class State {
     blackCarX;
     blueCarX;
     orangeCarX;
@@ -36,7 +35,20 @@ class State{
     blueCarSpeed;
     orangeCarSpeed;
     systemStatus;
- 
+
+    /**
+     * Create a state.
+     * @param {number} blackCarX - The x-coordinate of the black car.
+     * @param {number} blueCarX - The x-coordinate of the blue car.
+     * @param {number} orangeCarX - The x-coordinate of the orange car.
+     * @param {number} blackCarY - The y-coordinate of the black car.
+     * @param {number} blueCarY - The y-coordinate of the blue car.
+     * @param {number} orangeCarY - The y-coordinate of the orange car.
+     * @param {number} blackCarSpeed - The speed of the black car.
+     * @param {number} blueCarSpeed - The speed of the blue car.
+     * @param {number} orangeCarSpeed - The speed of the orange car.
+     * @param {boolean} systemStatus - The system status.
+     */
     constructor(blackCarX=0, blueCarX=0, orangeCarX=0, blackCarY=0, blueCarY=0, orangeCarY=0, blackCarSpeed=0, blueCarSpeed=0, orangeCarSpeed=0, systemStatus=true){
         this.blackCarX = blackCarX;
         this.blueCarX = blueCarX;
@@ -50,6 +62,10 @@ class State{
         this.systemStatus = systemStatus;
     }
 
+    /**
+     * Set the state properties with new state values.
+     * @param {State} newState - The new state.
+     */
     setState(newState){
         this.blackCarX = newState.blackCarX;
         this.blueCarX = newState.blueCarX;
@@ -63,6 +79,9 @@ class State{
         this.systemStatus = newState.systemStatus;
     }
 
+    /**
+     * Stop all cars by setting their speeds to 0.
+     */
     stopCars(){
         this.blackCarSpeed = 0;
         this.blueCarSpeed = 0;
@@ -70,7 +89,7 @@ class State{
     }
 }
   
-// blackCarX blueCarX orangeCarX blackCarY blueCarY orangeCarY blackCarSpeed blueCarSpeed orangeCarSpeed
+// Initial states for different use cases
 let initialStates = {
     1: new State(SCREEN_WIDTH / 2, 0, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 6, -1),
     2: new State(SCREEN_WIDTH / 4, (SCREEN_WIDTH / 4) - 100, -1, RIGHT_LANE, RIGHT_LANE, -1, 2, 2, -1),
@@ -79,19 +98,20 @@ let initialStates = {
     5: new State(-1, CAR_WIDTH * 2, -1, -1, RIGHT_LANE, -1, -1, 2, -1), 
     6: new State(-1, CAR_WIDTH, -1, -1, RIGHT_LANE, -1, -1, 3, -1),
     7: new State(-1, CAR_WIDTH, -1, -1, RIGHT_LANE, -1, -1, 3, -1),
-
 };
 
-var curState = new State(); 
+var curState = new State(); // Current state
 
-// Game loop for Use Case 1
+/**
+ * Game loop for Use Case 1.
+ */
 function caseOne() {
-    dh.drawSetting(1, curState.systemStatus);
+    dh.drawSetting(1, curState.systemStatus); // Draw setting for use case 1
 
-    // Black car
-    dh.drawCar(curState.blackCarX, RIGHT_LANE, "BLACK")
+    // Draw black car
+    dh.drawCar(curState.blackCarX, RIGHT_LANE, "BLACK");
 
-    // Blue car
+    // Draw blue car
     dh.drawCar(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
@@ -115,14 +135,16 @@ function caseOne() {
     }
 }
 
-// Game loop for Use Case 2
+/**
+ * Game loop for Use Case 2.
+ */
 function caseTwo() {
-    dh.drawSetting(2, curState.systemStatus);
+    dh.drawSetting(2, curState.systemStatus); // Draw setting for use case 2
 
-    // Black car
+    // Draw black car
     dh.drawCar(curState.blackCarX, RIGHT_LANE, "BLACK");
 
-    // Blue car
+    // Draw blue car
     dh.drawCar(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
@@ -159,17 +181,19 @@ function caseTwo() {
     }
 } 
 
-// Game loop for Use Case 3
+/**
+ * Game loop for Use Case 3.
+ */
 function caseThree() {
-    dh.drawSetting(3, curState.systemStatus);
+    dh.drawSetting(3, curState.systemStatus); // Draw setting for use case 3
 
-    // Black car
+    // Draw black car
     dh.drawCar(curState.blackCarX, curState.blackCarY, "BLACK");
 
-    // Blue car
+    // Draw blue car
     dh.drawCar(curState.blueCarX, curState.blueCarY, "BLUE");
     
-    // Yellow car
+    // Draw yellow car
     dh.drawCar(curState.orangeCarX, curState.orangeCarY, "YELLOW");
 
     // Update cars position if animation is active
@@ -209,15 +233,17 @@ function caseThree() {
     }
 }
 
-// Game loop for Use Case 4
+/**
+ * Game loop for Use Case 4.
+ */
 function caseFour() {
-    dh.drawSetting(4, curState.systemStatus);
+    dh.drawSetting(4, curState.systemStatus); // Draw setting for use case 4
 
-    // Black car
+    // Draw black car
     dh.drawCar(curState.blackCarX, RIGHT_LANE, "BLACK");
 
-    // Blue car
-    dh.drawCat(curState.blueCarX, RIGHT_LANE, "BLUE");
+    // Draw blue car
+    dh.drawCar(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
     if (animate) {
@@ -257,11 +283,13 @@ function caseFour() {
     }
 }
 
-// Game loop for Use Case 5
+/**
+ * Game loop for Use Case 5.
+ */
 function caseFive() {
-    dh.drawSetting(5, curState.systemStatus);
+    dh.drawSetting(5, curState.systemStatus); // Draw setting for use case 5
 
-    // Blue car
+    // Draw blue car
     dh.drawCar(curState.blueCarX, RIGHT_LANE, "BLUE");
 
     // Update cars position if animation is active
@@ -284,11 +312,13 @@ function caseFive() {
     }
 }
 
-// Game loop for Use Case 6
+/**
+ * Game loop for Use Case 6.
+ */
 function caseSix() {
-    dh.drawSetting(6, curState.systemStatus);
+    dh.drawSetting(6, curState.systemStatus); // Draw setting for use case 6
 
-    // Blue car
+    // Draw blue car
     dh.drawCar(curState.blueCarX, curState.blueCarY, "BLUE");
 
     if (animate) {
@@ -303,19 +333,23 @@ function caseSix() {
             }
         } 
 
-        if (curState.blueCarY - CAR_WIDTH / 2 < MIDDLE_LANE + LANE_WIDTH / 2){
+        if (curState.blueCarY > MIDDLE_LANE && curState.blueCarY < RIGHT_LANE) { 
             curState.systemStatus = false;
+        } else {
+            curState.systemStatus = true;
         }
 
         curState.blueCarX += curState.blueCarSpeed;
     }
 }
 
-// Game loop for Use Case 7
+/**
+ * Game loop for Use Case 7.
+ */
 function caseSeven() {
-    dh.drawSetting(7, curState.systemStatus);
+    dh.drawSetting(7, curState.systemStatus); // Draw setting for use case 7
 
-    // Blue car
+    // Draw blue car
     dh.drawCar(curState.blueCarX, curState.blueCarY, "BLUE")
 
     if (animate) {
@@ -334,21 +368,24 @@ function caseSeven() {
     }
 }
 
-// Main animation loop
+/**
+ * Main animation loop.
+ */
 function gameLoop() {
-    if (mainMenuActive) dh.drawMainMenu(selectedOption, menuOptions);
-   
-    else if (selectedOption == 0) caseOne();
-    else if (selectedOption == 1) caseTwo();
-    else if (selectedOption == 2) caseThree();
-    else if (selectedOption == 3) caseFour();
-    else if (selectedOption == 4) caseFive();
-    else if (selectedOption == 5) caseSix();
-    else if (selectedOption == 6) caseSeven();
-    
-    requestAnimationFrame(gameLoop);
+    if (mainMenuActive) {
+        dh.drawMainMenu(selectedOption, menuOptions); // Draw main menu
+    } else {
+        // Execute the selected use case
+        if (selectedOption == 0) caseOne();
+        else if (selectedOption == 1) caseTwo();
+        else if (selectedOption == 2) caseThree();
+        else if (selectedOption == 3) caseFour();
+        else if (selectedOption == 4) caseFive();
+        else if (selectedOption == 5) caseSix();
+        else if (selectedOption == 6) caseSeven();
+    }
+    requestAnimationFrame(gameLoop); // Request the next frame
 }
-
 
 document.addEventListener("DOMContentLoaded", () => {
     canvas = document.getElementById("PrototypeCanvas");
@@ -364,7 +401,8 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (event.key === "ArrowDown") {
                 selectedOption = (selectedOption + 1) % menuOptions.length;
             } else if (event.key === "Enter") {
-                mainMenuActive = false; // Start use case                animate = false; // Reset animation state
+                mainMenuActive = false; // Start use case
+                animate = false; // Reset animation state
                 curState.setState(initialStates[selectedOption + 1]); // Set initial state
             }
         } else {
